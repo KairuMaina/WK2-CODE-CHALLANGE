@@ -28,3 +28,45 @@ input {
     border-radius: 4px;
     margin-right: 10px;
 }
+button {
+    padding: 10px;
+    border: none;
+    background: #28a745;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+}
+button:hover {
+    background: #218838
+}
+ul {
+    list-style: none;
+    padding: 0;
+}
+li {
+    background: #eee;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center; 
+}
+li.purchased {
+    text-decoration: line-through;
+    background-color: #d4edda;
+}
+
+// media queries
+@media (max-width: 600px) {
+    shoppingApp {
+        padding: 10px;
+    }
+    form {
+        flex-direction:column;
+    }
+    input, button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
