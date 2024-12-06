@@ -13,3 +13,18 @@ body {
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
+h1 {
+    text-align: center;
+}
+form {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 10px;
+}
