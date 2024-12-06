@@ -3,21 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shopping List</title>
+    <title>Shopping List App</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="shoppingApp">
+    <header>
         <h1>Shopping List</h1>
-        <form id="addItemForm">
-            <input type="text" id="itemName" placeholder="Enter an item">
-            <input type="number"  id="itemQuantity" placeholder="QTY">
-            <button type="submit" id="submit">Add</button>
-        </form>
-        <ul id="itemList"></ul>
-        <button id="markPurchased">Mark Purchased</button>
-        <button id="clearList">Clear List</button>
-    </div>
+    </header>
+    <main id="shoppingApp">
+        <!-- Form Section -->
+        <section id="formSection">
+            <h2>Add New Item</h2>
+            <form id="addItemForm">
+                <div class="inputGroup">
+                    <label for="itemName">Item Name:</label>
+                    <input type="text" id="itemName" placeholder="Enter an item">
+                </div>
+                <div class="inputGroup">
+                    <label for="itemQuantity">Quantity:</label>
+                    <input type="number" id="itemQuantity" placeholder="Qty" min="1">
+                </div>
+                <div class="inputGroup">
+                    <label for="itemCategory">Category:</label>
+                    <select id="itemCategory">
+                        <option value="fruits">Fruits</option>
+                        <option value="Vegetables">Vegetables</option>
+                        <option value="Cutlery">Cutlery</option>
+                        <option value="Farm Tools">Farm Tools</option>
+                    </select>
+                </div>
+                <div class="inputGroup">
+                    <label for="itemNotes">Notes:</label>
+                    <textarea id="itemNotes" placeholder="Add notes..."></textarea>
+                </div>
+                <button type="submit" id="submit">Add</button>
+            </form>
+        </section>
+        
+        <!-- Items List Section -->
+        <section id="itemsSection">
+            <h2>Items List</h2>
+            <ul id="itemList"></ul>
+        </section>
+        
+        <!-- Search Section -->
+        <section id="searchSection">
+            <h2>Search Items</h2>
+            <div class="inputGroup">
+                <label for="searchInput">Search:</label>
+                <input type="text" id="searchInput" placeholder="Search items...">
+                <button id="searchButton">Search</button>
+            </div>
+        </section>
+
+        <!-- List Management Section -->
+        <section id="managementSection">
+            <h2>Manage Lists</h2>
+            <div class="inputGroup">
+                <label for="listSelector">List:</label>
+                <select id="listSelector">
+                    <option value="default">Default List</option>
+                </select>
+                <button id="newList">New List</button>
+            </div>
+        </section>
+
+        <!-- Actions Section -->
+        <section id="actionsSection">
+            <h2>Actions</h2>
+            <button id="markPurchased">Mark Purchased</button>
+            <button id="clearList">Clear List</button>
+            <button id="shareList">Share List</button>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Sentinel Richplus by Kairu Maina. All rights reserved.</p>
+    </footer>
     <script src="script.js"></script>   
 </body>
 </html>
