@@ -147,6 +147,7 @@ li.purchased {
     background-color: #d4edda;
 }
 
+
 /* Responsiveness */
 @media (max-width: 600px) {
     #shoppingApp {
