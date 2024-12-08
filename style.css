@@ -1,110 +1,163 @@
+/* Base Styles */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f8f8f8; /* Light grey background */
+    background-color: #f8f8f8;
     margin: 0;
-    padding: 20px;
+    padding: 0; /* Remove extra padding */
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    min-height: 100vh; /* Ensures body fills at least the full viewport height */
 }
 
-header, footer {
+header {
     text-align: center;
-    background-color: #444; /* Dark grey header and footer */
+    background-color: #444;
     color: #fff;
-    padding: 15px 0; /* Increased padding for better aesthetics */
+    padding: 8px;
+    margin-bottom: 20px;
 }
 
-header h1, footer p {
-    margin: 0;
+header h1 {
+    margin: 18px 0;
 }
 
 #shoppingApp {
     background: #fff;
     padding: 25px;
     border-radius: 10px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    margin: 0 auto 20px; /* Add spacing between the app and footer */
+    max-width: 600px;
+    flex: 1; /* Ensures the main content expands to push the footer down */
+}
+
+footer {
+    text-align: center;
+    color: #fff;
+    padding: 8px;
+    margin-top: 20px; /* Adds spacing above the footer */
+    flex-shrink: 0; /* Prevents the footer from shrinking when there's little content */
+}
+
+/* General Styles */
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+    background-color: #f0f4f8;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    color: #333;
+}
+
+/* Header */
+header {
+    text-align: center;
+    background-color: black;
+    color: #fff;
+    padding: 20px;
+    margin-bottom: 30px; /* Creates spacing between header and main content */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    font-size: 2rem;
+    margin: 0;
+}
+
+/* Main Content Area */
+#shoppingApp {
+    background: #ffffff;
+    padding: 40px; /* Increased padding for better spacing */
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin: 0 auto 40px; /* Adds space below the app and above the footer */
+    max-width: 800px;
     flex: 1;
 }
 
-#formSection, #managementSection, #itemsSection, #actionsSection {
-    margin-bottom: 20px;
+/* Footer */
+footer {
+    text-align: center;
+    background-color: black;
+    color: #fff;
+    padding: 15px;
+    margin-top: auto; /* Push footer to the bottom */
 }
 
+/* Input and Buttons */
 .inputGroup {
-    margin-bottom: 15px;
+    margin-bottom: 20px; /* Consistent spacing between form fields */
 }
 
 input, select, textarea {
     width: 100%;
-    padding: 5px; /* Smaller padding */
-    border: 2px solid #ccc; /* Slightly thicker border for a modern look */
-    border-radius: 0; /* Square corners */
-    background-color: #f2f2f2; /* Light grey background for inputs */
-    font-size: 12px; /* Smaller font size */
+    padding: 12px;
+    margin-bottom: 10px; /* Space below each input */
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    font-size: 14px;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
 }
 
 input:focus, select:focus, textarea:focus {
-    border-color: #444; /* Dark grey border on focus */
+    border-color: green;
+    background-color: #ffffff;
     outline: none;
 }
 
 button {
-    padding: 10px 15px; /* Smaller button padding */
+    padding: 12px 20px;
     border: none;
-    background: #444;
+    background: black;
     color: #fff;
+    font-size: 14px;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 button:hover {
-    background: #333; /* Darker grey on hover */
+    background: lightgray;
+    transform: scale(1.05);
 }
 
+/* List Styling */
 ul {
     list-style: none;
     padding: 0;
+    margin-top: 20px; /* Space above the item list */
 }
 
 li {
-    background: #e6e6e6; /* Light grey background for list items */
-    padding: 10px; /* Smaller padding */
-    border: 1px solid #ddd;
-    margin-bottom: 10px;
+    background: #e9ecef;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 15px; /* Consistent spacing between items */
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 li.purchased {
     text-decoration: line-through;
-    background-color: #d4edda; /* Light green for purchased items */
+    background-color: #d4edda;
 }
 
-body.dark-mode {
-    background-color: #333;
-    color: #fff;
-}
+/* Responsiveness */
+@media (max-width: 600px) {
+    #shoppingApp {
+        padding: 20px;
+    }
 
-.dark-mode #shoppingApp {
-    background-color: #444;
-    color: #fff;
-}
+    button {
+        width: 100%; /* Full-width buttons for small screens */
+    }
 
-.dark-mode button {
-    background-color: #555;
-    color: #fff;
-}
-
-.dark-mode button:hover {
-    background-color: #666;
-}
-
-.dark-mode input, .dark-mode textarea {
-    background-color: #555;
-    color: #fff;
-    border: 1px solid #fff;
+    header h1 {
+        font-size: 1.5rem;
+    }
 }

@@ -1,147 +1,168 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const addItemForm = document.getElementById('addItemForm');
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('addItemForm');
     const itemList = document.getElementById('itemList');
-    const itemNameInput = document.getElementById('itemName');
-    const itemQuantityInput = document.getElementById('itemQuantity');
-    const itemCategoryInput = document.getElementById('itemCategory');
     const searchInput = document.getElementById('searchInput');
     const listSelector = document.getElementById('listSelector');
-    const newListButton = document.getElementById('newList');
-
-    let lists = JSON.parse(localStorage.getItem('lists')) || { default: [] };
+    const localStorageKey = 'shoppingLists';
     let currentList = 'default';
 
-    // Load current list
-    loadList(currentList);
+    // Load lists and items
+    const loadLists = () => {
+        const savedLists = JSON.parse(localStorage.getItem(localStorageKey)) || { default: [] };
+        if (!savedLists[currentList]) savedLists[currentList] = [];
+        return savedLists;
+    };
 
-    // Request notification permission
-    if ('Notification' in window && Notification.permission !== 'granted') {
-        Notification.requestPermission();
-    }
+    const saveLists = (lists) => {
+        localStorage.setItem(localStorageKey, JSON.stringify(lists));
+    };
 
-    addItemForm.addEventListener('submit', function(event) {
-        event.preventDefault();
-        const itemName = itemNameInput.value;
-        const itemQuantity = itemQuantityInput.value;
-        const itemCategory = itemCategoryInput.value;
-        if (itemName && itemQuantity && itemCategory) {
-            addItemToDOM(itemName, itemQuantity, itemCategory, false);
-            saveItemToLocalStorage(itemName, itemQuantity, itemCategory, false);
-            showNotification(`${itemName} added to the list!`);
-            itemNameInput.value = '';
-            itemQuantityInput.value = 1;
-            itemCategoryInput.value = 'Other';
+    const loadItems = () => {
+        const lists = loadLists();
+        itemList.innerHTML = ''; // Clear current items
+        lists[currentList].forEach(addItemToDOM);
+    };
+
+    const saveItems = () => {
+        const lists = loadLists();
+        lists[currentList] = [...itemList.children].map(item => ({
+            name: item.querySelector('.name').textContent,
+            quantity: item.querySelector('.quantity').textContent.replace(/[()]/g, ''),
+            category: item.querySelector('.category').textContent,
+            notes: item.dataset.notes || '',
+            purchased: item.classList.contains('purchased'),
+        }));
+        saveLists(lists);
+    };
+
+    const addItemToDOM = ({ name, quantity, category, notes = '', purchased = false }) => {
+        const li = document.createElement('li');
+        li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+        li.classList.toggle('purchased', purchased);
+        li.dataset.notes = notes; // Store notes in dataset
+
+        li.innerHTML = `
+            <div>
+                <input type="checkbox" class="mark-purchased me-2" ${purchased ? 'checked' : ''}>
+                <span class="name">${name}</span>
+                <span class="quantity">(${quantity})</span>
+                <span class="category text-muted ms-2">${category}</span>
+                ${notes ? `<small class="text-info d-block">Note: ${notes}</small>` : ''}
+            </div>
+            <div>
+                <button class="btn btn-sm btn-info edit-btn"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-sm btn-danger delete-btn"><i class="fas fa-trash"></i></button>
+            </div>
+        `;
+
+        // Mark as Purchased
+        li.querySelector('.mark-purchased').addEventListener('change', (e) => {
+            li.classList.toggle('purchased', e.target.checked);
+            saveItems();
+        });
+
+        // Delete Item
+        li.querySelector('.delete-btn').addEventListener('click', () => {
+            itemList.removeChild(li);
+            saveItems();
+        });
+
+        // Edit Item
+        li.querySelector('.edit-btn').addEventListener('click', () => {
+            const newName = prompt('Enter new name:', name);
+            const newQuantity = prompt('Enter new quantity:', quantity);
+            const newCategory = prompt('Enter new category:', category);
+            const newNotes = prompt('Enter new notes:', notes);
+
+            if (newName && newQuantity && newCategory) {
+                li.querySelector('.name').textContent = newName;
+                li.querySelector('.quantity').textContent = `(${newQuantity})`;
+                li.querySelector('.category').textContent = newCategory;
+                li.dataset.notes = newNotes;
+                li.querySelector('.text-info')?.remove(); // Remove old notes if any
+                if (newNotes) {
+                    const noteElement = document.createElement('small');
+                    noteElement.classList.add('text-info', 'd-block');
+                    noteElement.textContent = `Note: ${newNotes}`;
+                    li.querySelector('div').appendChild(noteElement);
+                }
+                saveItems();
+            }
+        });
+
+        itemList.appendChild(li);
+    };
+
+    // Form Submit
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = form.itemName.value.trim();
+        const quantity = form.itemQuantity.value;
+        const category = form.itemCategory.value;
+        const notes = form.itemNotes.value.trim();
+
+        if (!name) {
+            document.getElementById('itemNameError').hidden = false;
+            return;
         }
+
+        document.getElementById('itemNameError').hidden = true;
+        addItemToDOM({ name, quantity, category, notes });
+        saveItems();
+        form.reset();
     });
 
-    searchInput.addEventListener('input', function() {
-        const searchText = searchInput.value.toLowerCase();
-        const items = document.querySelectorAll('#itemList li');
-        items.forEach(item => {
-            const itemName = item.textContent.toLowerCase();
-            item.style.display = itemName.includes(searchText) ? '' : 'none';
+    // Search Items
+    searchInput.addEventListener('input', () => {
+        const query = searchInput.value.toLowerCase();
+        [...itemList.children].forEach(item => {
+            const name = item.querySelector('.name').textContent.toLowerCase();
+            item.style.display = name.includes(query) ? '' : 'none';
         });
     });
 
-    listSelector.addEventListener('change', function(event) {
-        currentList = event.target.value;
-        loadList(currentList);
-    });
-
-    newListButton.addEventListener('click', function() {
-        const newListName = prompt('Enter new list name:');
-        if (newListName && !lists[newListName]) {
-            lists[newListName] = [];
-            localStorage.setItem('lists', JSON.stringify(lists));
+    // Manage Lists
+    const updateListSelector = () => {
+        const lists = loadLists();
+        listSelector.innerHTML = '';
+        Object.keys(lists).forEach(listName => {
             const option = document.createElement('option');
-            option.value = newListName;
-            option.textContent = newListName;
+            option.value = listName;
+            option.textContent = listName;
+            if (listName === currentList) option.selected = true;
             listSelector.appendChild(option);
-            currentList = newListName;
-            listSelector.value = newListName;
-            loadList(currentList);
-        } else {
-            alert('List already exists or invalid name.');
-        }
-    });
-
-    document.getElementById('toggleDarkMode').addEventListener('click', function() {
-        document.body.classList.toggle('dark-mode');
-    });
-
-    document.getElementById('markPurchased').addEventListener('click', function() {
-        const items = itemList.children;
-        for (let item of items) {
-            item.classList.toggle('purchased');
-            updateItemInLocalStorage(item.firstChild.textContent.split(' (')[0], item.classList.contains('purchased'));
-        }
-    });
-
-    document.getElementById('clearList').addEventListener('click', function() {
-        itemList.innerHTML = '';
-        lists[currentList] = [];
-        localStorage.setItem('lists', JSON.stringify(lists));
-        showNotification('Shopping list cleared!');
-    });
-
-    document.getElementById('shareList').addEventListener('click', function() {
-        const items = document.querySelectorAll('#itemList li');
-        let listContent = 'Shopping List:\n';
-        items.forEach(item => {
-            listContent += `${item.textContent.split(' - ')[0]} (${item.textContent.split(' - ')[1].split(' ')[0]})\n`;
         });
+    };
 
-        const mailtoLink = `mailto:?subject=Shopping List&body=${encodeURIComponent(listContent)}`;
-        window.location.href = mailtoLink;
+    listSelector.addEventListener('change', (e) => {
+        currentList = e.target.value;
+        loadItems();
     });
 
-    function loadList(listName) {
-        itemList.innerHTML = '';
-        (lists[listName] || []).forEach(item => addItemToDOM(item.name, item.quantity, item.category, item.purchased, item.notes));
-    }
-
-    function addItemToDOM(name, quantity, category, purchased, notes = '') {
-        const newItem = document.createElement('li');
-        newItem.innerHTML = `${name} (${quantity}) - ${category} <button class="edit">Edit</button><p>${notes}</p>`;
-        newItem.classList.toggle('purchased', purchased);
-        newItem.querySelector('.edit').addEventListener('click', function(event) {
-            event.stopPropagation();
-            const newName = prompt('Edit item name:', name);
-            const newQuantity = prompt('Edit item quantity:', quantity);
-            const newCategory = prompt('Edit item category:', category);
-            const newNotes = prompt('Edit item notes:', notes);
-            if (newName && newQuantity && newCategory && newNotes) {
-                newItem.innerHTML = `${newName} (${newQuantity}) - ${newCategory} <button class="edit">Edit</button><p>${newNotes}</p>`;
-                updateItemInLocalStorage(name, newQuantity, newCategory, newItem.classList.contains('purchased'), newName, newNotes);
-                name = newName;
-                notes = newNotes;
+    document.getElementById('newList').addEventListener('click', () => {
+        const newListName = prompt('Enter new list name:');
+        if (newListName) {
+            const lists = loadLists();
+            if (!lists[newListName]) {
+                lists[newListName] = [];
+                saveLists(lists);
+                updateListSelector();
+                listSelector.value = newListName;
+                currentList = newListName;
+                loadItems();
+            } else {
+                alert('List already exists!');
             }
-        });
-        newItem.addEventListener('click', function() {
-            newItem.classList.toggle('purchased');
-            updateItemInLocalStorage(name, newItem.classList.contains('purchased'), notes);
-        });
-        itemList.appendChild(newItem);
-    }
-
-    function saveItemToLocalStorage(name, quantity, category, purchased, notes = '') {
-        lists[currentList].push({ name, quantity, category, purchased, notes });
-        localStorage.setItem('lists', JSON.stringify(lists));
-    }
-
-    function updateItemInLocalStorage(name, purchased, notes, newName = null) {
-        lists[currentList] = lists[currentList].map(item => {
-            if (item.name === name) {
-                return { name: newName || item.name, quantity: item.quantity, category: item.category, purchased: purchased, notes: notes };
-            }
-            return item;
-        });
-        localStorage.setItem('lists', JSON.stringify(lists));
-    }
-
-    function showNotification(message) {
-        if (Notification.permission === 'granted') {
-            new Notification(message);
         }
-    }
+    });
+
+    // Sort Items
+    new Sortable(itemList, {
+        animation: 150,
+        onEnd: saveItems,
+    });
+
+    // Initial Load
+    updateListSelector();
+    loadItems();
 });
